@@ -71,8 +71,8 @@ def data_status() -> list[dict]:
     """Which markets exist and which candles are stored locally (per market: 1min and 5min files with
     first and last time). Empty `data` means the user still has to run `uv run tradelab download`."""
     stored = store.status()
-    return [{"market": key, "label": m.label, "note": m.note,
-             "data": [row for row in stored if row["market"] == key]} for key, m in MARKETS.items()]
+    return [{"market": m.key, "label": m.label, "source": m.source, "note": m.note,
+             "data": [row for row in stored if row["market"] == m.key]} for m in map(get_market, MARKETS)]
 
 
 @server.tool()

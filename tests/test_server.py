@@ -143,6 +143,16 @@ def test_data_status_lists_all_markets(home, gold_data):
     assert "Proxy" in rows["SILVER"]["note"]
 
 
+def test_data_status_and_warnings_follow_the_source_of_the_data(home, example, gold_data):
+    from tradelab.markets import set_source
+
+    set_source("GOLD", "histdata")
+    gold = {r["market"]: r for r in server.data_status()}["GOLD"]
+    assert gold["source"] == "histdata" and "HistData" in gold["note"]
+    server.save_strategy(example)
+    assert any("HistData" in w for w in server.run_backtest(NAME)["warnings"])
+
+
 def test_tools_are_registered():
     import asyncio
 

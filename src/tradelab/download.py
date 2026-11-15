@@ -5,6 +5,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 from . import twelvedata
+from .histdata import import_folder
 from .markets import MARKETS, get_market
 from .store import load_base, save_candles
 from .twelvedata import DataSourceError
@@ -31,6 +32,11 @@ def download(
     now = now or datetime.now(timezone.utc)
     chosen = [get_market(key.strip().upper()) for key in markets]
     for market in chosen:
+        if market.source != "twelvedata":
+            # prices differ per source, so a market filled from files is never topped up from the API
+            log(f"{market.key}: skipped, its candles come from HistData files. "
+                "Add newer files with 'tradelab import'.")
+            continue
         for base, years in (("5min", years_5min), ("1min", years_1min)):
             stored = load_base(market.key, base)
             first, last = (None, None) if stored.empty else (stored.index[0], stored.index[-1])
@@ -52,18 +58,26 @@ def download(
     log("Done.")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        prog="tradelab", description="Download candles from Twelve Data and store them locally.")
-    parser.add_argument("command", choices=["download"])
-    parser.add_argument("--markets", default=",".join(MARKETS),
-                        help=f"comma-separated, default: all ({', '.join(MARKETS)})")
-    parser.add_argument("--years-5min", type=float, default=5)
-    parser.add_argument("--years-1min", type=float, default=1)
-    args = parser.parse_args()
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(prog="tradelab", description="Get candles onto this computer.")
+    commands = parser.add_subparsers(dest="command", required=True)
+    from_files = commands.add_parser(
+        "import", help="read 1-minute files downloaded by hand from HistData.com (no key, no limits)")
+    from_files.add_argument("folder", help="folder with the HistData .zip or .csv files")
+    from_files.add_argument("--replace", action="store_true",
+                            help="delete a market's Twelve Data candles and use the files instead")
+    from_api = commands.add_parser("download", help="download candles from Twelve Data (needs a free key)")
+    from_api.add_argument("--markets", default=",".join(MARKETS),
+                          help=f"comma-separated, default: all ({', '.join(MARKETS)})")
+    from_api.add_argument("--years-5min", type=float, default=5)
+    from_api.add_argument("--years-1min", type=float, default=1)
+    args = parser.parse_args(argv)
     try:
-        twelvedata.api_key()
-        download(args.markets.split(","), args.years_5min, args.years_1min)
+        if args.command == "import":
+            import_folder(args.folder, args.replace)
+        else:
+            twelvedata.api_key()
+            download(args.markets.split(","), args.years_5min, args.years_1min)
     except (DataSourceError, ValueError) as error:
         sys.exit(f"Error: {error}")
     except KeyboardInterrupt:

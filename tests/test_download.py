@@ -78,6 +78,22 @@ def test_download_logs_progress_without_key(home, monkeypatch):
     assert not any("SECRET123" in line for line in lines)
 
 
+def test_download_skips_a_market_that_holds_imported_files(home):
+    from tradelab.markets import set_source
+
+    save_candles("GOLD", "5min", make_candles("2024-12-01 00:00", 10, "5min", price=2000.0))
+    set_source("GOLD", "histdata")
+    lines, asked = [], []
+
+    def fetch(symbol, interval, start, end, **_):
+        asked.append(symbol)
+        yield make_candles("2025-01-02 00:00", 10, interval)
+
+    download(["GOLD", "SP500"], fetch=fetch, now=NOW, log=lines.append)
+    assert set(asked) == {"SPY"} and len(load_base("GOLD", "5min")) == 10
+    assert any("GOLD" in line and "skipped" in line.lower() for line in lines)
+
+
 def test_market_names_are_forgiving(home):
     download([" gold "], fetch=full_fetch, now=NOW, log=QUIET)
     assert not load_base("GOLD", "5min").empty

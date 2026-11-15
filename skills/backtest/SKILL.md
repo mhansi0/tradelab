@@ -17,7 +17,15 @@ Follow the steps in order. Do not skip step 5.
 
 ### 1. Check the data
 
-Call `data_status`. If the market the user wants has no data, stop and tell them to run this in a terminal first. It needs a free Twelve Data key and takes about 35 minutes for all markets. It can be stopped and started again.
+Call `data_status`. If the market the user wants has no data, stop and explain the two ways to get candles. Each is a one-time step in a terminal.
+
+**Way 1, files from HistData.com (no account, no limits, recommended to start).** The user downloads the 1-minute zip files per year from https://www.histdata.com/download-free-forex-data/?/ascii/1-minute-bar-quotes (`XAU/USD` gold, `XAG/USD` silver, `SPX/USD` S&P 500, `NSX/USD` Nasdaq 100), puts them in one folder without unzipping, and runs:
+
+```
+uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab import <folder>
+```
+
+**Way 2, Twelve Data (free key, about 35 minutes for all markets, can be stopped and started again).**
 
 ```
 uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab download
@@ -25,7 +33,7 @@ uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab download
 
 The key goes in the file `~/.tradelab/twelvedata.key` (one line) or in the environment variable `TWELVEDATA_API_KEY`. Never ask the user to paste the key in the chat.
 
-Silver is a stand-in: the SLV fund, US market hours only. Say so when the user picks silver.
+A market holds candles from one source only. `data_status` shows the `source` and a `note` per market. Tell the user what the note says when it matters for their strategy: HistData files have no volume and their index prices trade almost around the clock, and with Twelve Data silver is the SLV fund, US market hours only.
 
 ### 2. Ask for the strategy
 

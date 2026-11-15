@@ -74,7 +74,7 @@ def never_triggers(example) -> dict:
     return example
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)  # every test gets its own storage, never the real ~/.tradelab
 def home(tmp_path, monkeypatch):
     monkeypatch.setenv("TRADELAB_HOME", str(tmp_path))
     return tmp_path

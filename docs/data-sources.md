@@ -1,8 +1,43 @@
 # Data sources
 
-tradelab downloads candles from [Twelve Data](https://twelvedata.com) and stores them locally. Indicators are never downloaded. They are always calculated from the stored candles.
+tradelab stores candles locally and backtests read only those files. Indicators are never downloaded. They are always calculated from the stored candles.
 
-## What the free plan gives (checked 15 November 2026)
+There are two ways to fill the storage: files from HistData.com (`tradelab import`) and the Twelve Data API (`tradelab download`). A market holds candles from one source only, because prices differ per source. The file `~/.tradelab/data/<MARKET>/source.txt` records which one.
+
+## HistData.com files (checked 15 November 2026)
+
+Free 1-minute files, downloaded by hand in a browser, one zip per year. No account, no key, no request limit.
+
+| Market | Their name | 1-minute history starts |
+|---|---|---|
+| S&P 500 | `SPX/USD` | November 2010 |
+| Nasdaq 100 | `NSX/USD` | November 2010 |
+| Gold | `XAU/USD` | March 2009 |
+| Silver | `XAG/USD` | May 2009 |
+
+File format ("Generic ASCII" M1), from their specification: no header, semicolons, one candle per line.
+
+```
+20120201 000000;1.306600;1.306600;1.306560;1.306560;0
+```
+
+The fields are time, open, high, low, close and volume. What matters:
+
+- Times are Eastern Standard Time without daylight saving. tradelab adds 5 hours to get UTC.
+- Prices are bid quotes of one provider, not exchange prices.
+- Volume is always 0.
+- The two index prices trade almost around the clock. The trading day for strategies still starts at 09:30 New York, unless the strategy sets its own `session_start`.
+
+How tradelab uses the files:
+
+- `tradelab import <folder>` reads every `.zip` and `.csv` in the folder whose name holds one of the four names, for example `HISTDATA_COM_ASCII_XAUUSD_M1_2024.zip`. Other files are skipped and reported.
+- All files are read before anything is stored. One unreadable file stops the import and nothing changes.
+- The minutes are stored, and the 5-minute candles are rebuilt from all stored minutes.
+- It refuses to import into a market that holds Twelve Data candles, unless `--replace` is given. That deletes those candles first.
+
+Not checked: the quality of the files (gaps, bad ticks) and how the current year is offered. Their terms of use are not on the download page. A third party describes them as free for personal and educational use with limits on redistribution, so do not publish the files.
+
+## Twelve Data, what the free plan gives (checked 15 November 2026)
 
 | Market | Symbol used | Intraday history starts | Note |
 |---|---|---|---|
