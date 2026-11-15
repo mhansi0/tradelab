@@ -1,0 +1,14 @@
+{
+  "name": "tradelab",
+  "description": "Backtest trading strategies described in plain language, from inside Claude.",
+  "owner": {
+    "name": "mhansi0"
+  },
+  "plugins": [
+    {
+      "name": "tradelab",
+      "source": "./",
+      "description": "Explain a trading strategy in plain words, backtest it and get a report with charts and three example trades."
+    }
+  ]
+}

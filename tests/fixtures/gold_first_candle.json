@@ -1,0 +1,20 @@
+{
+  "name": "goud-eerste-candle-short",
+  "description": "Als de eerste 1-uurscandle van de dag bij XAUUSD daalt met meer dan 0,5% en de volgende candle sluit terug naar boven maar onder de helft van de eerste candle, met RSI < 30, dan short met TP 4R en SL boven de eerste candle.",
+  "market": "GOLD",
+  "timeframe": "1h",
+  "indicators": {"rsi": {"type": "rsi", "length": 14}},
+  "setups": [{
+    "name": "short-na-daling",
+    "direction": "short",
+    "entry_when": [
+      "bar_of_day == 2",
+      "(first.close - first.open) / first.open < -0.005",
+      "close > open",
+      "close < (first.high + first.low) / 2",
+      "rsi < 30"
+    ],
+    "stop": "first.high",
+    "take_profit_r": 4
+  }]
+}
