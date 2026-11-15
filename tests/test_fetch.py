@@ -56,9 +56,13 @@ def test_an_unknown_name_stops_before_anything_is_downloaded(home, server):
 
 def test_a_missing_address_says_how_to_set_it(monkeypatch):
     monkeypatch.delenv(SOURCE_ENV, raising=False)
-    for source in (None, "http://plain.example.test"):  # https only
+    for source in (None, "http://plain.example.test", "http://localhost.evil.test"):  # https only
         with pytest.raises(DataSourceError, match=SOURCE_ENV):
             available(source)
+
+
+def test_plain_http_is_allowed_for_this_computer_only(server):
+    assert set(available("http://localhost:8000/candles", server[0])) == {"AAPL", "MSFT"}
 
 
 def test_the_address_can_come_from_the_environment(home, server, monkeypatch):

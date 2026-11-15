@@ -19,7 +19,8 @@ NEW_YORK = "America/New_York"
 STOCK_NOTE = (
     "US stock candles from the HF Data Library: trades on the IEX exchange only, regular hours "
     "(09:30 to 16:00 New York). Volume is only the IEX part of all trading and minutes without "
-    "trades are missing. Not checked for split or dividend adjustment.")
+    "trades are missing. Adjusted for stock splits, not for dividends. The data terms allow academic "
+    "and educational research only, not trading with real money.")
 FOREX_NOTE = "Forex or CFD quotes from files, not exchange prices. No volume (always 0)."
 
 

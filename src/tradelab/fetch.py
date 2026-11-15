@@ -11,6 +11,7 @@ import re
 import tempfile
 from contextlib import nullcontext
 from pathlib import Path
+from urllib.parse import urlparse
 
 import httpx
 
@@ -37,7 +38,9 @@ def _open(client: httpx.Client | None):
 
 def _address(source: str | None) -> str:
     address = (source or os.environ.get(SOURCE_ENV, "")).rstrip("/")
-    if not address.startswith("https://"):
+    url = urlparse(address)
+    # https only; plain http just for a folder served on this computer (testing)
+    if url.scheme != "https" and not (url.scheme == "http" and url.hostname in ("localhost", "127.0.0.1")):
         raise DataSourceError(
             f"No download address. Pass --source https://... or set {SOURCE_ENV}. "
             "It is the web folder that holds the .parquet files and their index.json.")

@@ -53,7 +53,20 @@ Besides the four markets above, any number of markets can be imported from `.par
 - Files are imported one by one. A file that cannot be read is skipped and reported, the rest goes on. Running it again merges: stored minutes are never duplicated.
 - The tool `data_status` lists these markets only when given a `search`, because there are more than a thousand.
 
-Not checked: whether the stock prices are adjusted for splits and dividends, and gaps inside the forex files. Five forex files do not cover 24 hours (BCOUSD, EURHUF, FRXEUR, HKXHKD, UDXUSD).
+What was checked on 15 November 2026:
+
+- **Splits and dividends (stocks):** prices are adjusted for stock splits and not for dividends. The HF Data Library says so itself, and the files agree: AMZN, GOOGL, TSLA, NVDA, AVGO, CMG, WMT and LRCX show no jump of 1:3 to 1:50 at their splits, and the AAPL closes on three dates match the real closes to a few cents (the real closes are from memory). The library says files downloaded before 6 October 2026 hold a dividend adjustment for part of the period. Do not mix those with newer files: a second import merges by time stamp and would join two different price series. These files were downloaded on 15 November 2026.
+- **Gaps (forex):** every pair has the daily break of about one hour. Outside the weekend a typical pair has 13 gaps over 3 hours in almost five years, and the longest ones sit on holidays (EURUSD: Good Friday 2023 with 69 hours, New Year with 24 hours). No unexplained holes were seen, but not every gap was looked at. Five files trade only part of the day (BCOUSD, EURHUF, FRXEUR, HKXHKD, UDXUSD) and have a gap every night.
+
+## Terms of the stock data
+
+- The HF Data Library is licensed CC BY 4.0 for the compilation. The bars come from IEX, so IEX's terms apply too: when you share the data you keep "Data provided for free by IEX." with a link to https://www.iex.io/legal/hist-data-terms, and you tell the receiver about both terms.
+- Their terms of use (https://hfdatalibrary.com/pages/terms) allow academic and educational research only. They forbid trading and investing with the data, including "building strategies or signals used with real money", and any use where a data error could cause a financial loss. Commercial use is not listed as permitted.
+- tradelab backtests are for learning how a strategy behaved. Do not trade on them. Whoever uses the stock files is responsible for reading those terms.
+- Each person can download the files from hfdatalibrary.com themselves: single tickers in the browser without an account, or through their API with a free key (100 downloads per minute, key valid 30 days). tradelab does not host or fetch these files for anyone else.
+- The files carry `citation` and `iex_attribution` in their metadata. tradelab's own stored copies do not keep it, so keep the original files.
+
+The forex or CFD files in the `parquet` folder: where they come from is unknown, so their terms are unknown too. Only the gold file was compared (same candles as HistData for 2024). Do not share them before that is clear.
 
 ## Twelve Data, what the free plan gives (checked 15 November 2026)
 

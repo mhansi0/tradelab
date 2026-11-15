@@ -68,7 +68,7 @@ Already have 1-minute candles as `.parquet` files? Put them in one folder (subfo
 tradelab import-parquet <folder>
 ```
 
-The market name is the file name up to the first underscore: `AAPL_clean_1min.parquet` becomes market `AAPL`, `EURUSD_M1_2022-2026.parquet` becomes `EURUSD`. A file needs a time column (`time` or `datetime`) and open, high, low, close and volume. Times without a time zone are read as New York time and the file as a US stock (day starts 09:30). Times in UTC are read as a forex or CFD quote file (day starts 17:00 New York). `XAUUSD`, `XAGUSD`, `SPXUSD` and `NSXUSD` go to the gold, silver, S&P 500 and Nasdaq 100 markets. Files that cannot be read are skipped and listed. About 25 minutes for 400 million candles, and the stored candles take about 1.6 times the size of the files.
+The market name is the file name up to the first underscore: `AAPL_clean_1min.parquet` becomes market `AAPL`, `EURUSD_M1_2022-2026.parquet` becomes `EURUSD`. A file needs a time column (`time` or `datetime`) and open, high, low, close and volume. Times without a time zone are read as New York time and the file as a US stock (day starts 09:30). Times in UTC are read as a forex or CFD quote file (day starts 17:00 New York). `XAUUSD`, `XAGUSD`, `SPXUSD` and `NSXUSD` go to the gold, silver, S&P 500 and Nasdaq 100 markets. Files that cannot be read are skipped and listed. US stock files from the HF Data Library come with terms: academic and educational research only, no trading, and "Data provided for free by IEX." when you share them. About 25 minutes for 400 million candles, and the stored candles take about 1.6 times the size of the files.
 
 Ask Claude to search the data ("which tradelab data do I have for AAPL?"): imported markets are only listed when you search.
 
@@ -89,7 +89,7 @@ To publish the files yourself, put them in one flat folder on a host that serves
 uv run python -c "from tradelab.fetch import write_index; write_index(r'<folder>')"
 ```
 
-Check first that the terms of the data allow sharing it. The stock files come from the HF Data Library with IEX data, and HistData asks you not to republish its files. The repository itself never holds the data.
+Check first that the terms of the data allow sharing it. The stock files come from the HF Data Library with IEX data: CC BY 4.0, but their terms allow academic and educational research only and forbid trading with the data, so they are better downloaded by each person from [hfdatalibrary.com](https://hfdatalibrary.com) (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). HistData asks you not to republish its files. The repository itself never holds the data.
 
 ### One source per market
 

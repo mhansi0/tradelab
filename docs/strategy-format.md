@@ -35,9 +35,9 @@ A strategy is a JSON object with fixed fields. Conditions and prices are short f
 |---|---|
 | `name` | Name to find the strategy again. Letters, digits and dashes are kept. |
 | `description` | The user's original text. |
-| `market` | `SP500`, `NAS100`, `GOLD` or `SILVER`. |
+| `market` | `SP500`, `NAS100`, `GOLD` or `SILVER`, or the name of an imported market: a US stock (`AAPL`) or a forex pair (`EURUSD`), see `tradelab import-parquet`. |
 | `timeframe` | `1min`, `5min`, `15min`, `30min`, `1h`, `4h` or `1day`. |
-| `timezone`, `session_start` | Optional. When the trading day starts, for example `"America/New_York"` and `"09:30"`. Left out: the market's own. Gold and spot silver: 18:00 New York, when the market reopens after its daily break. The S&P 500, the Nasdaq 100 and the silver fund: 09:30 New York. |
+| `timezone`, `session_start` | Optional. When the trading day starts, for example `"America/New_York"` and `"09:30"`. Left out: the market's own. Gold and spot silver: 18:00 New York, when the market reopens after its daily break. The S&P 500, the Nasdaq 100, the silver fund and imported US stocks: 09:30 New York. Imported forex pairs: 17:00 New York. |
 | `indicators` | Named indicators, see below. The name is what formulas use. |
 | `setups` | One or more setups. Use two setups for a strategy that trades long and short. |
 

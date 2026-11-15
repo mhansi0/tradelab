@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from . import indicators as ind
 from .expr import FUNCTIONS, ExprError, Namespace, evaluate, names_in, refs_in
@@ -59,12 +59,18 @@ class Strategy(BaseModel):
 
     name: str
     description: str = ""
-    market: Literal["SP500", "NAS100", "GOLD", "SILVER"]
+    market: str
     timeframe: Literal["1min", "5min", "15min", "30min", "1h", "4h", "1day"]
     timezone: str | None = None
     session_start: str | None = Field(None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
     indicators: dict[str, IndicatorSpec] = {}
     setups: list[Setup] = Field(min_length=1)
+
+    @field_validator("market")
+    @classmethod
+    def _known_market(cls, key: str) -> str:
+        get_market(key)  # the four built in and the imported ones; the error lists the valid names
+        return key
 
     def session(self) -> tuple[str, str]:
         """(timezone, session_start), the strategy's own or else the market's."""

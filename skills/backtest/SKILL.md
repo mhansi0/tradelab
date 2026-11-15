@@ -1,6 +1,6 @@
 ---
 name: backtest
-description: Backtest a trading strategy that the user explains in plain words or pastes as Pine Script. Use when the user wants to test, check or understand a trading strategy on historical data for the S&P 500, Nasdaq 100, gold or silver.
+description: Backtest a trading strategy that the user explains in plain words or pastes as Pine Script. Use when the user wants to test, check or understand a trading strategy on historical data for the S&P 500, Nasdaq 100, gold, silver, a US stock or a forex pair.
 ---
 
 # Backtest a strategy
@@ -17,7 +17,7 @@ Follow the steps in order. Do not skip step 5.
 
 ### 1. Check the data
 
-Call `data_status`. If the market the user wants has no data, stop and explain the two ways to get candles. Each is a one-time step in a terminal.
+Call `data_status`. It lists the four built-in markets (S&P 500, Nasdaq 100, gold, silver). US stocks (`AAPL`) and forex pairs (`EURUSD`) imported from parquet files are only listed when you call it with a `search`, for example `search: "AAPL"`. If the market the user wants has no data, stop and explain how to get candles. Each is a one-time step in a terminal.
 
 **Way 1, files from HistData.com (no account, no limits, recommended to start).** The user downloads the 1-minute zip files per year from https://www.histdata.com/download-free-forex-data/?/ascii/1-minute-bar-quotes (`XAU/USD` gold, `XAG/USD` silver, `SPX/USD` S&P 500, `NSX/USD` Nasdaq 100), puts them in one folder without unzipping, and runs:
 
@@ -33,13 +33,21 @@ uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab download
 
 The key goes in the file `~/.tradelab/twelvedata.key` (one line) or in the environment variable `TWELVEDATA_API_KEY`. Never ask the user to paste the key in the chat.
 
+**Way 3, 1-minute `.parquet` files (US stocks, forex pairs, any number of markets).** The user puts the files in one folder and runs:
+
+```
+uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab import-parquet <folder>
+```
+
+The market name is the file name up to the first underscore (`AAPL_clean_1min.parquet` is `AAPL`). When someone has published the files as a web folder, `tradelab fetch --source <https address> AAPL EURUSD` gets only those markets. Stock files from the HF Data Library may be used for academic and educational research only: tell the user that once when they pick a US stock, and do not suggest trading on the result.
+
 A market holds candles from one source only. `data_status` shows the `source` and a `note` per market. Tell the user what the note says when it matters for their strategy: HistData files have no volume and their index prices trade almost around the clock, and with Twelve Data silver is the SLV fund, US market hours only.
 
 ### 2. Ask for the strategy
 
 Ask the user to describe the strategy in their own words, or to paste Pine Script. You need:
 
-- the market: S&P 500, Nasdaq 100, gold or silver
+- the market: S&P 500, Nasdaq 100, gold, silver, or an imported US stock or forex pair
 - the candle size: 1min, 5min, 15min, 30min, 1h, 4h or 1day
 - when to enter, long or short
 - where the stop loss is

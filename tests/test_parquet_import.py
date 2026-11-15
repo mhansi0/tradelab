@@ -79,6 +79,18 @@ def test_unknown_market_names_stay_inside_the_data_folder(home):
             get_market(key)
 
 
+def test_a_strategy_can_use_an_imported_market(home, tmp_path, example):
+    from tradelab.strategy import validate
+
+    put(tmp_path / "AAPL_clean_1min.parquet", stock_times(), time_column="datetime")
+    import_parquet_folder(tmp_path, log=lambda *_: None)
+    example["market"] = "AAPL"
+    strategy, errors = validate(example)
+    assert errors == [] and strategy.session() == ("America/New_York", "09:30")
+    example["market"] = "MSFT"  # not imported
+    assert any("Unknown market" in error for error in validate(example)[1])
+
+
 def test_data_status_lists_imported_markets_only_when_searched(home, tmp_path):
     for name in ("AAPL", "AAL", "MSFT"):
         put(tmp_path / f"{name}_clean_1min.parquet", stock_times(), time_column="datetime")
