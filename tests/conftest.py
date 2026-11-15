@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,6 +12,13 @@ def make_candles(start: str, periods: int, freq: str, price: float = 100.0) -> p
     data = {c: np.full(periods, float(price)) for c in ("open", "high", "low", "close")}
     data["volume"] = np.full(periods, 1.0)
     return pd.DataFrame(data, index=index)
+
+
+@pytest.fixture
+def example() -> dict:
+    """The maker's example strategy, a fresh copy per test."""
+    path = Path(__file__).parent / "fixtures" / "gold_first_candle.json"
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture

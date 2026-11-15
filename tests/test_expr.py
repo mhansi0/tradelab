@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from tradelab.expr import ExprError, Namespace, evaluate, names_in
+from tradelab.expr import ExprError, Namespace, evaluate, names_in, refs_in
 
 NAN = float("nan")
 ENV = {
@@ -81,6 +81,10 @@ def test_rejects_everything_else(bad):
     with pytest.raises(ExprError) as e:
         evaluate(bad, ENV)
     assert bad in str(e.value)
+
+
+def test_refs_in_keeps_the_field_after_the_dot():
+    assert refs_in("prev(close) > first.high and rsi < 30") == {"close", "first.high", "rsi"}
 
 
 def test_names_in_rejects_bad_syntax():

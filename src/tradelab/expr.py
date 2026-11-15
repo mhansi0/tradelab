@@ -66,11 +66,22 @@ def _parse(expr: str) -> ast.Expression:
         raise ExprError(f"Cannot read formula: {expr}") from None
 
 
-def names_in(expr: str) -> set[str]:
-    """The names a formula uses, without function names."""
+def refs_in(expr: str) -> set[str]:
+    """What a formula reads, with the field after a dot: {"close", "first.high"}. No function names."""
     nodes = list(ast.walk(_parse(expr)))
-    called = {n.func.id for n in nodes if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
-    return {n.id for n in nodes if isinstance(n, ast.Name)} - called
+    refs, not_a_value = set(), set()
+    for node in nodes:
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+            refs.add(f"{node.value.id}.{node.attr}")
+            not_a_value.add(id(node.value))
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            not_a_value.add(id(node.func))
+    return refs | {n.id for n in nodes if isinstance(n, ast.Name) and id(n) not in not_a_value}
+
+
+def names_in(expr: str) -> set[str]:
+    """The names a formula uses, without function names and without the field after a dot."""
+    return {ref.split(".")[0] for ref in refs_in(expr)}
 
 
 def evaluate(expr: str, env: Mapping[str, Any]) -> Any:
