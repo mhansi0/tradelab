@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Explain a trading strategy in plain words, backtest it on locally stored candles and get a report with charts and three example trades.",
   "author": {
-    "name": "tradelab contributors"
+    "name": "mhansi0"
   },
   "license": "MIT",
   "keywords": ["trading", "backtesting", "mcp"],

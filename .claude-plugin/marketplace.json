@@ -2,7 +2,7 @@
   "name": "tradelab",
   "description": "Backtest trading strategies described in plain language, from inside Claude.",
   "owner": {
-    "name": "tradelab contributors"
+    "name": "mhansi0"
   },
   "plugins": [
     {

@@ -16,17 +16,17 @@ A strategy can look great in a backtest and still fail when you trade it, becaus
 
 ## Install
 
-1. Add this repository as a plugin marketplace and install the plugin. Replace `<owner>` with the GitHub account that hosts this repository.
+1. Add this repository as a plugin marketplace and install the plugin.
 
    ```
-   claude plugin marketplace add <owner>/tradelab
+   claude plugin marketplace add mhansi0/tradelab
    claude plugin install tradelab@tradelab
    ```
 
    On Claude Code 2.1.275 or later this also works in one step, inside a session:
 
    ```
-   /plugin install tradelab --marketplace <owner>/tradelab
+   /plugin install tradelab --marketplace mhansi0/tradelab
    ```
 
 2. Get the candles, see below.
@@ -83,13 +83,7 @@ tradelab fetch --source https://<the web folder> AAPL EURUSD
 
 Set the environment variable `TRADELAB_DATA_URL` to the folder once and leave out `--source`. A market is about 1 to 30 MB. Only `https` addresses work, and nothing is downloaded when one name is not in the index.
 
-To publish the files yourself, put them in one flat folder on a host that serves single files (a Hugging Face dataset, for example), then write the index and upload it with the files:
-
-```
-uv run python -c "from tradelab.fetch import write_index; write_index(r'<folder>')"
-```
-
-Check first that the terms of the data allow sharing it. The stock files come from the HF Data Library with IEX data: CC BY 4.0, but their terms allow academic and educational research only and forbid trading with the data, so they are better downloaded by each person from [hfdatalibrary.com](https://hfdatalibrary.com) (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). HistData asks you not to republish its files. The repository itself never holds the data.
+The files are shared from Cloudflare R2, see [docs/hosting-the-data.md](docs/hosting-the-data.md). They are not mine: the US stocks come from the [HF Data Library](https://hfdatalibrary.com) (Ahmed Elkassabgi, CC BY 4.0), "Data provided for free by IEX.", and the forex and CFD candles from [HistData.com](https://www.histdata.com). Their terms still apply to you. The stock data is for academic and educational research only: do not trade on it (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). The repository itself never holds the data.
 
 ### One source per market
 

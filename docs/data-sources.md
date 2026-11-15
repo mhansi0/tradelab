@@ -63,10 +63,14 @@ What was checked on 15 November 2026:
 - The HF Data Library is licensed CC BY 4.0 for the compilation. The bars come from IEX, so IEX's terms apply too: when you share the data you keep "Data provided for free by IEX." with a link to https://www.iex.io/legal/hist-data-terms, and you tell the receiver about both terms.
 - Their terms of use (https://hfdatalibrary.com/pages/terms) allow academic and educational research only. They forbid trading and investing with the data, including "building strategies or signals used with real money", and any use where a data error could cause a financial loss. Commercial use is not listed as permitted.
 - tradelab backtests are for learning how a strategy behaved. Do not trade on them. Whoever uses the stock files is responsible for reading those terms.
-- Each person can download the files from hfdatalibrary.com themselves: single tickers in the browser without an account, or through their API with a free key (100 downloads per minute, key valid 30 days). tradelab does not host or fetch these files for anyone else.
-- The files carry `citation` and `iex_attribution` in their metadata. tradelab's own stored copies do not keep it, so keep the original files.
+- Each person can also download the files from hfdatalibrary.com themselves: single tickers in the browser without an account, or through their API with a free key (100 downloads per minute, key valid 30 days).
+- The files carry `citation` and `iex_attribution` in their metadata. tradelab's own stored copies do not keep it, so share the original files, not tradelab's stored copies.
 
-The forex or CFD files in the `parquet` folder: where they come from is unknown, so their terms are unknown too. Only the gold file was compared (same candles as HistData for 2024). Do not share them before that is clear.
+## Sharing the files
+
+The maker asked both providers by email (HF Data Library for the stocks, HistData.com for the forex or CFD files, which are HistData candles converted to parquet). Both answered that sharing is fine as long as the source is named. That is the maker's report: the emails are not in this repository, so keep them. The terms of use above still apply to whoever uses the data, so the stock files stay for academic and educational research.
+
+The text that goes with every shared copy is in [hosting-the-data.md](hosting-the-data.md), which also describes how the files are put on Cloudflare R2 for `tradelab fetch`. The notes that `data_status` and every backtest show carry the same source names.
 
 ## Twelve Data, what the free plan gives (checked 15 November 2026)
 
