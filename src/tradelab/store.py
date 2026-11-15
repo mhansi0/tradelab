@@ -78,13 +78,15 @@ def load_candles(
     return df
 
 
-def status() -> list[dict]:
+def status(markets=None) -> list[dict]:
+    """What is stored per market (default: the four built in). Reads only the time column."""
     rows = []
-    for market in MARKETS:
+    for market in markets or MARKETS:
         for base in BASES:
-            df = load_base(market, base)
-            if not df.empty:
+            path = data_file(market, base)
+            index = pd.read_parquet(path, columns=[]).index if path.exists() else []
+            if len(index):
                 rows.append({
-                    "market": market, "base": base, "rows": len(df),
-                    "first": df.index[0].isoformat(), "last": df.index[-1].isoformat()})
+                    "market": market, "base": base, "rows": len(index),
+                    "first": index[0].isoformat(), "last": index[-1].isoformat()})
     return rows

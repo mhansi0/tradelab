@@ -38,6 +38,23 @@ How tradelab uses the files:
 
 Not checked: the quality of the files (gaps, bad ticks) and how the current year is offered. Their terms of use are not on the download page. A third party describes them as free for personal and educational use with limits on redistribution, so do not publish the files.
 
+## Parquet files (`tradelab import-parquet`)
+
+Besides the four markets above, any number of markets can be imported from `.parquet` files with 1-minute candles. Checked on 15 November 2026 with 1253 US stocks and 60 forex or CFD files.
+
+| Kind | How it is recognized | Trading day starts | Notes |
+|---|---|---|---|
+| US stock | times without time zone | 09:30 New York | HF Data Library: IEX trades only, regular hours, minutes without trades are missing, 303 million candles in 1253 files, March 2022 to November 2026 |
+| Forex or CFD | times in UTC | 17:00 New York | volume always 0; the week opens Sunday 22:00 UTC (21:00 in summer), which is 17:00 New York |
+
+- The naive stock times are New York wall-clock time: on all 1253 files the first candle is 09:30 and the last 15:59, summer and winter. The conversion to UTC follows daylight saving.
+- The market name is the file name up to the first underscore. A ticker equal to a built-in market name gets `-US` (stock `GOLD` is stored as `GOLD-US`). `XAUUSD`, `XAGUSD`, `SPXUSD` and `NSXUSD` are stored in the built-in markets: the 2024 gold candles of this file were identical to the HistData ones.
+- Every other market gets a `market.json` next to its candles in `~/.tradelab/data/<NAME>/`: label, time zone, day start and note.
+- Files are imported one by one. A file that cannot be read is skipped and reported, the rest goes on. Running it again merges: stored minutes are never duplicated.
+- The tool `data_status` lists these markets only when given a `search`, because there are more than a thousand.
+
+Not checked: whether the stock prices are adjusted for splits and dividends, and gaps inside the forex files. Five forex files do not cover 24 hours (BCOUSD, EURHUF, FRXEUR, HKXHKD, UDXUSD).
+
 ## Twelve Data, what the free plan gives (checked 15 November 2026)
 
 | Market | Symbol used | Intraday history starts | Note |

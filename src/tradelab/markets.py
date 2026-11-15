@@ -1,8 +1,10 @@
-from dataclasses import dataclass
+import json
+import re
+from dataclasses import asdict, dataclass
 
 import pandas as pd
 
-from .paths import data_file
+from .paths import data_file, home
 
 
 @dataclass(frozen=True)
@@ -70,10 +72,30 @@ def set_source(key: str, source: str) -> None:
     file.write_text(source, encoding="utf-8")
 
 
+def _market_file(key: str):
+    return data_file(key, "market").with_suffix(".json")
+
+
+def save_market(market: Market) -> None:
+    """Remember a market that is not one of the four built in (forex pairs, stocks from files)."""
+    file = _market_file(market.key)
+    file.parent.mkdir(parents=True, exist_ok=True)
+    file.write_text(json.dumps(asdict(market)), encoding="utf-8")
+
+
+def imported_keys() -> list[str]:
+    return sorted(file.parent.name for file in (home() / "data").glob("*/market.json"))
+
+
 def get_market(key: str) -> Market:
-    if key not in MARKETS:
-        raise ValueError(f"Unknown market {key!r}. Valid markets: {', '.join(MARKETS)}")
-    return HISTDATA[key] if source_of(key) == "histdata" else MARKETS[key]
+    if key in MARKETS:
+        return HISTDATA[key] if source_of(key) == "histdata" else MARKETS[key]
+    # the pattern keeps a strategy's market name from pointing outside the data folder
+    if re.fullmatch(r"[A-Z0-9-]+", key) and _market_file(key).exists():
+        return Market(**json.loads(_market_file(key).read_text(encoding="utf-8")))
+    raise ValueError(
+        f"Unknown market {key!r}. Valid markets: {', '.join(MARKETS)}, and the {len(imported_keys())} "
+        "imported ones (forex pairs, stocks): data_status with a search lists them")
 
 
 def session_keys(index: pd.DatetimeIndex, timezone: str, session_start: str) -> pd.DataFrame:

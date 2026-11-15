@@ -8,7 +8,7 @@ from mcp.server.mcpserver import MCPServer
 from . import charts, report, store
 from . import strategy as strategies
 from .engine import run
-from .markets import MARKETS, get_market
+from .markets import MARKETS, get_market, imported_keys
 from .paths import slugify, strategy_dir
 from .stats import pick_examples, summarize
 
@@ -20,6 +20,7 @@ server = MCPServer(
         "Explain results, never advise what to buy or sell."))
 
 FEW_TRADES = 30
+MAX_SEARCH = 25
 
 
 def _when(text: str | None) -> pd.Timestamp | None:
@@ -67,12 +68,23 @@ def _backtest(strategy: strategies.Strategy, start: str | None, end: str | None,
 
 
 @server.tool()
-def data_status() -> list[dict]:
+def data_status(search: str | None = None) -> list[dict]:
     """Which markets exist and which candles are stored locally (per market: 1min and 5min files with
-    first and last time). Empty `data` means the user still has to run `uv run tradelab download`."""
-    stored = store.status()
-    return [{"market": m.key, "label": m.label, "source": m.source, "note": m.note,
-             "data": [row for row in stored if row["market"] == m.key]} for m in map(get_market, MARKETS)]
+    first and last time). Empty `data` means the user still has to run `uv run tradelab download`.
+    Lists the four built-in markets. Imported forex pairs and US stocks (`tradelab import-parquet`)
+    are only listed when you search: `search` matches part of a market's name (`AAPL`, `EUR`,
+    `stock`), at most 25 are returned."""
+    keys = list(MARKETS)
+    if search:
+        words = search.strip().upper()
+        keys = [k for k in (*MARKETS, *imported_keys()) if words in k or words in get_market(k).label.upper()]
+    shown = keys[:MAX_SEARCH]
+    stored = store.status(shown)
+    rows = [{"market": m.key, "label": m.label, "source": m.source, "note": m.note,
+             "data": [row for row in stored if row["market"] == m.key]} for m in map(get_market, shown)]
+    if len(keys) > len(shown):
+        rows.append({"market": None, "note": f"{len(keys) - len(shown)} more match: search for more of the name."})
+    return rows
 
 
 @server.tool()

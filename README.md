@@ -12,7 +12,7 @@ A strategy can look great in a backtest and still fail when you trade it, becaus
 
 - [Claude Code](https://claude.com/claude-code) (terminal or desktop app)
 - [uv](https://docs.astral.sh/uv/) (it installs Python and the packages for you)
-- Candles on your computer. Two ways, see [Get the candles](#get-the-candles): free files from HistData.com (no account, no limits), or a free Twelve Data API key
+- Candles on your computer. Three ways, see [Get the candles](#get-the-candles): free files from HistData.com (no account, no limits), a free Twelve Data API key, or your own `.parquet` files
 
 ## Install
 
@@ -59,6 +59,37 @@ Know this about these files: prices are the bid quotes of one provider, the volu
 2. Run `tradelab download`. It takes about 35 minutes for all four markets, because the free plan allows 8 requests per minute. You can stop it and run it again: it continues where it stopped.
 
 This gives exchange prices with volume for `SPY` and `QQQ`, from 2020 on, and a silver fund instead of the silver price.
+
+### Way 3: your own .parquet files (US stocks, forex pairs)
+
+Already have 1-minute candles as `.parquet` files? Put them in one folder (subfolders are fine) and run:
+
+```
+tradelab import-parquet <folder>
+```
+
+The market name is the file name up to the first underscore: `AAPL_clean_1min.parquet` becomes market `AAPL`, `EURUSD_M1_2022-2026.parquet` becomes `EURUSD`. A file needs a time column (`time` or `datetime`) and open, high, low, close and volume. Times without a time zone are read as New York time and the file as a US stock (day starts 09:30). Times in UTC are read as a forex or CFD quote file (day starts 17:00 New York). `XAUUSD`, `XAGUSD`, `SPXUSD` and `NSXUSD` go to the gold, silver, S&P 500 and Nasdaq 100 markets. Files that cannot be read are skipped and listed. About 25 minutes for 400 million candles, and the stored candles take about 1.6 times the size of the files.
+
+Ask Claude to search the data ("which tradelab data do I have for AAPL?"): imported markets are only listed when you search.
+
+#### Only the markets you need: `tradelab fetch`
+
+Nobody has to download the whole set. If someone published the files as a web folder (one `.parquet` per market, plus an `index.json`), you fetch single markets:
+
+```
+tradelab fetch --source https://<the web folder> --list EUR
+tradelab fetch --source https://<the web folder> AAPL EURUSD
+```
+
+Set the environment variable `TRADELAB_DATA_URL` to the folder once and leave out `--source`. A market is about 1 to 30 MB. Only `https` addresses work, and nothing is downloaded when one name is not in the index.
+
+To publish the files yourself, put them in one flat folder on a host that serves single files (a Hugging Face dataset, for example), then write the index and upload it with the files:
+
+```
+uv run python -c "from tradelab.fetch import write_index; write_index(r'<folder>')"
+```
+
+Check first that the terms of the data allow sharing it. The stock files come from the HF Data Library with IEX data, and HistData asks you not to republish its files. The repository itself never holds the data.
 
 ### One source per market
 
@@ -116,7 +147,7 @@ The full rule format is in [docs/strategy-format.md](docs/strategy-format.md). W
 
 ## How it works
 
-- `tradelab import` reads HistData files and `tradelab download` fetches from Twelve Data. Both store the candles once, as files in `~/.tradelab/data`.
+- `tradelab import` reads HistData files, `tradelab import-parquet` reads parquet files, `tradelab fetch` gets single markets from a published copy of them and `tradelab download` fetches from Twelve Data. They store the candles once, as files in `~/.tradelab/data`.
 - An MCP server gives Claude seven tools: check the data, validate, save, list and load strategies, run a backtest, build the report.
 - Two skills tell Claude how to lead the conversation: `backtest` and `strategy`.
 - Claude writes the rules and the explanation. The calculations are done by tested Python code, not by the model.
