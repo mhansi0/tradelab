@@ -19,6 +19,14 @@ def test_get_market_unknown_lists_valid_keys():
         get_market("BITCOIN")
 
 
+def test_metals_day_starts_when_the_market_reopens():
+    from tradelab.markets import HISTDATA
+
+    for market in (MARKETS["GOLD"], HISTDATA["GOLD"], HISTDATA["SILVER"]):
+        assert (market.timezone, market.session_start) == ("America/New_York", "18:00")
+    assert MARKETS["SILVER"].session_start == "09:30"  # the SLV fund keeps stock market hours
+
+
 def test_silver_is_flagged_as_proxy():
     assert "Proxy" in get_market("SILVER").note
 

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 from conftest import make_candles
 
@@ -88,7 +89,7 @@ def test_name_must_have_letters(example):
 
 def test_env_session_names(example):
     s, _ = validate(example)
-    candles = ramp("2025-01-02 00:00", 48, "1h")
+    candles = ramp("2025-01-01 23:00", 48, "1h")
     env = build_env(s, candles)
     assert env["bar_of_day"].tolist()[:3] == [1, 2, 3] and env["bar_of_day"].iloc[24] == 1
     assert (env["first"]["high"].iloc[:24] == candles["high"].iloc[0]).all()
@@ -100,10 +101,26 @@ def test_env_session_names(example):
 
 
 def test_env_respects_session_override(example):
-    example["session_start"] = "06:00"
+    example["timezone"], example["session_start"] = "UTC", "06:00"
     s, _ = validate(example)
-    env = build_env(s, ramp("2025-01-02 00:00", 48, "1h"))
-    assert env["bar_of_day"].iloc[6] == 1
+    env = build_env(s, ramp("2025-01-01 23:00", 48, "1h"))
+    assert env["bar_of_day"].iloc[7] == 1  # the 06:00 UTC candle
+
+
+def test_gold_day_starts_at_18_new_york_so_sunday_is_part_of_monday(example):
+    s, _ = validate(example)
+    friday = ramp("2025-01-03 00:00", 22, "1h")       # until the Friday close, 17:00 New York
+    monday = ramp("2025-01-05 23:00", 10, "1h")       # from the Sunday open, 18:00 New York
+    candles = pd.concat([friday, monday])
+    env = build_env(s, candles)
+    assert env["bar_of_day"].iloc[22:25].tolist() == [1, 2, 3]
+    assert (env["prev_day"]["close"].iloc[22:] == friday["close"].iloc[-1]).all()
+
+
+def test_gold_day_follows_new_york_summer_time(example):
+    s, _ = validate(example)
+    env = build_env(s, ramp("2025-07-01 20:00", 6, "1h"))  # 18:00 New York is 22:00 UTC in summer
+    assert env["bar_of_day"].tolist() == [1, 2, 1, 2, 3, 4]
 
 
 def test_env_namespaces_for_macd_and_bollinger(example):
@@ -112,13 +129,13 @@ def test_env_namespaces_for_macd_and_bollinger(example):
     example["setups"][0]["entry_when"] = ["macd.hist > 0", "close > bb.upper"]
     s, errors = validate(example)
     assert errors == []
-    env = build_env(s, ramp("2025-01-02 00:00", 48, "1h"))
+    env = build_env(s, ramp("2025-01-01 23:00", 48, "1h"))
     assert set(env["macd"]) == {"line", "signal", "hist"} and set(env["bb"]) == {"upper", "mid", "lower"}
 
 
 def test_first_uses_first_available_bar(example):
     s, _ = validate(example)
-    candles = ramp("2025-01-02 00:00", 24, "1h").iloc[3:]
+    candles = ramp("2025-01-01 23:00", 24, "1h").iloc[3:]
     env = build_env(s, candles)
     assert (env["first"]["open"] == candles["open"].iloc[0]).all()
     assert env["bar_of_day"].iloc[0] == 1
@@ -126,7 +143,7 @@ def test_first_uses_first_available_bar(example):
 
 def test_explain_lists_each_condition(example):
     s, _ = validate(example)
-    env = build_env(s, ramp("2025-01-02 00:00", 48, "1h"))
+    env = build_env(s, ramp("2025-01-01 23:00", 48, "1h"))
     rows = explain(s.setups[0], env, env["close"].index[25])
     assert [r["expr"] for r in rows] == s.setups[0].entry_when
     assert rows[0] == {"expr": "bar_of_day == 2", "passed": True, "values": {"bar_of_day": 2}}
@@ -137,7 +154,7 @@ def test_explain_lists_each_condition(example):
 
 def test_explain_gives_none_for_missing_values(example):
     s, _ = validate(example)
-    env = build_env(s, ramp("2025-01-02 00:00", 48, "1h"))
+    env = build_env(s, ramp("2025-01-01 23:00", 48, "1h"))
     rows = explain(s.setups[0], env, env["close"].index[1])
     assert rows[4] == {"expr": "rsi < 30", "passed": False, "values": {"rsi": None}}
 

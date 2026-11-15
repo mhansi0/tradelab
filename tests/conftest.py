@@ -59,7 +59,7 @@ def gold_data(home):
             opens.extend(steps[:-1])
             closes.extend(steps[1:])
             price *= factor
-    candles = make_candles("2025-01-06 00:00", len(opens), "5min")
+    candles = make_candles("2025-01-05 23:00", len(opens), "5min")  # Sunday 18:00 New York
     candles["open"], candles["close"] = opens, closes
     candles["high"] = candles[["open", "close"]].max(axis=1)
     candles["low"] = candles[["open", "close"]].min(axis=1)

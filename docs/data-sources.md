@@ -27,6 +27,7 @@ The fields are time, open, high, low, close and volume. What matters:
 - Prices are bid quotes of one provider, not exchange prices.
 - Volume is always 0.
 - The two index prices trade almost around the clock. The trading day for strategies still starts at 09:30 New York, unless the strategy sets its own `session_start`.
+- Gold and silver stop every day from 17:00 to 18:00 New York. Their trading day starts at 18:00 New York. A day that starts at midnight UTC would turn every Sunday evening into a "day" of one candle: on the 2024 gold file that happened 52 times.
 
 How tradelab uses the files:
 

@@ -21,7 +21,7 @@ def test_full_flow(home, example, gold_data):
     assert out["examples"][0]["conditions"][0]["expr"] == "bar_of_day == 2"
     assert all(c["passed"] for e in out["examples"] for c in e["conditions"])
     assert out["examples"][1]["trade"]["outcome"] == "tp" and out["examples"][1]["trade"]["r"] == 4.0
-    assert out["data_range"] == ["2025-01-06", "2025-01-25"]
+    assert out["data_range"] == ["2025-01-05", "2025-01-25"]
     json.dumps(out)  # everything a tool returns must be plain JSON
 
     path = server.build_report(NAME, "Looks fine.")["path"]

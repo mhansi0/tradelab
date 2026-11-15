@@ -22,7 +22,9 @@ MARKETS: dict[str, Market] = {
     for m in (
         Market("SP500", "SPY", "S&P 500 (via the SPY fund)", "America/New_York", "09:30"),
         Market("NAS100", "QQQ", "Nasdaq 100 (via the QQQ fund)", "America/New_York", "09:30"),
-        Market("GOLD", "XAU/USD", "Gold (spot)", "UTC", "00:00"),
+        # metals reopen at 18:00 New York after the daily break; a midnight-UTC day would make
+        # every Sunday evening a one-candle "day"
+        Market("GOLD", "XAU/USD", "Gold (spot)", "America/New_York", "18:00"),
         Market(
             "SILVER", "SLV", "Silver (via the SLV fund)", "America/New_York", "09:30",
             "Proxy: SLV silver fund, US market hours only. Spot silver needs a paid data plan.",
@@ -46,8 +48,8 @@ HISTDATA: dict[str, Market] = {
                _INDEX_NOTE, "histdata"),
         Market("NAS100", "NSXUSD", "Nasdaq 100 (NSX/USD index price)", "America/New_York", "09:30",
                _INDEX_NOTE, "histdata"),
-        Market("GOLD", "XAUUSD", "Gold (spot)", "UTC", "00:00", _HISTDATA_NOTE, "histdata"),
-        Market("SILVER", "XAGUSD", "Silver (spot)", "UTC", "00:00", _HISTDATA_NOTE, "histdata"),
+        Market("GOLD", "XAUUSD", "Gold (spot)", "America/New_York", "18:00", _HISTDATA_NOTE, "histdata"),
+        Market("SILVER", "XAGUSD", "Silver (spot)", "America/New_York", "18:00", _HISTDATA_NOTE, "histdata"),
     )
 }
 
