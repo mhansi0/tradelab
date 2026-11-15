@@ -83,7 +83,7 @@ tradelab fetch --source https://<the web folder> AAPL EURUSD
 
 Set the environment variable `TRADELAB_DATA_URL` to the folder once and leave out `--source`. A market is about 1 to 30 MB. Only `https` addresses work, and nothing is downloaded when one name is not in the index.
 
-The files are shared from Cloudflare R2, see [docs/hosting-the-data.md](docs/hosting-the-data.md). They are not mine: the US stocks come from the [HF Data Library](https://hfdatalibrary.com) (Ahmed Elkassabgi, CC BY 4.0), "Data provided for free by IEX.", and the forex and CFD candles from [HistData.com](https://www.histdata.com). Their terms still apply to you. The stock data is for academic and educational research only: do not trade on it (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). The repository itself never holds the data.
+The files are shared from Backblaze B2, see [docs/hosting-the-data.md](docs/hosting-the-data.md). They are not mine: the US stocks come from the [HF Data Library](https://hfdatalibrary.com) (Ahmed Elkassabgi, CC BY 4.0), "Data provided for free by IEX.", and the forex and CFD candles from [HistData.com](https://www.histdata.com). Their terms still apply to you. The stock data is for academic and educational research only: do not trade on it (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). The repository itself never holds the data.
 
 ### One source per market
 

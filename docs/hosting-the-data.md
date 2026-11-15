@@ -1,6 +1,6 @@
 # Hosting the data files
 
-For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Cloudflare R2.
+For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Backblaze B2.
 
 ## The attribution that goes with every copy
 
@@ -27,10 +27,10 @@ Share the original files, not tradelab's stored copies: the originals carry `cit
    ```
 
    Rewrite it whenever files are added.
-2. In Cloudflare create an R2 bucket. The free plan has 10 GB of storage and no charge for downloads (Cloudflare's pricing page, checked 15 November 2026). The 1313 files are 6 GB, so about 4 GB is left: check the size before adding more.
-3. Make the bucket readable without a login. For `tradelab fetch` the address must be `https`. A custom domain on the bucket is the stable choice; the `r2.dev` address Cloudflare offers is meant for testing and may be limited (not checked).
-4. Upload the folder with an S3 tool such as `rclone` (create an R2 API token in Cloudflare; the endpoint is `https://<account id>.r2.cloudflarestorage.com`). The dashboard is slow for 1300 files. Check Cloudflare's rclone page for the exact settings.
-5. Test: `tradelab fetch --source https://<your address> --list EUR`.
+2. In Backblaze create a B2 bucket. The first 10 GB of storage is free, and downloads are free up to 3 times the stored data per month, then $0.01 per GB (Backblaze's pricing page, checked 15 November 2026). The 1313 files are 6 GB, so about 4 GB is left, and about 18 GB of downloads a month are free. Their bucket page speaks of 1 GB of free downloads per day instead: that contradicts the pricing page, so look at your own bill in the first weeks. Set a spending cap in your Backblaze account (not checked how).
+3. Make the bucket public (bucket type `allPublic`), so that files can be downloaded without a login. The address must be `https`. A custom domain cannot be put on a B2 bucket directly (Backblaze says so); the address of the bucket is enough for `tradelab fetch`.
+4. Upload the folder with `rclone`, which has a B2 backend (create an application key in your Backblaze account; never paste it in a chat or in the repository). The website is slow for 1300 files. Check rclone's B2 page for the exact settings.
+5. In the B2 website open one file: it shows the address to download that file (the "friendly URL"). Remove the file name from it: what is left is the address of the folder for `--source`. Test: `tradelab fetch --source https://<that address> --list EUR`.
 6. Put the address in the README and, if wanted, as the default in `fetch.py` so that `--source` can be left out.
 
 Do not put the files in the git repository.
