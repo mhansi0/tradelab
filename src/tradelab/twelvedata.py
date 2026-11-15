@@ -53,9 +53,10 @@ def fetch_page(symbol: str, interval: str, end: datetime | None, client: httpx.C
 
     if body.get("status") == "error":
         code = body.get("code")
-        if code == 404:  # no data found: there is nothing older
-            return _to_frame([])
         message = str(body.get("message", "")).replace(key, "***")
+        # no data found: there is nothing older than what we already have
+        if code == 404 or (code == 400 and "no data" in message.lower()):
+            return _to_frame([])
         if code == 429:
             raise _RateLimited(f"Twelve Data request limit reached: {message}")
         raise DataSourceError(f"Twelve Data error {code} for {symbol} {interval}: {message}")

@@ -29,7 +29,7 @@ def download(
     log=print,
 ) -> None:
     now = now or datetime.now(timezone.utc)
-    chosen = [get_market(key) for key in markets]
+    chosen = [get_market(key.strip().upper()) for key in markets]
     for market in chosen:
         for base, years in (("5min", years_5min), ("1min", years_1min)):
             stored = load_base(market.key, base)

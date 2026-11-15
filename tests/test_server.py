@@ -102,6 +102,15 @@ def test_period_limits_the_backtest(home, example, gold_data):
     assert json.loads((home / "strategies" / NAME / "backtest.json").read_text(encoding="utf-8"))["start"] == "2025-01-10"
 
 
+def test_period_without_any_candles(home, example, gold_data):
+    server.save_strategy(example)
+    out = server.run_backtest(NAME, start="2030-01-01")
+    assert out["summary"]["trades"] == 0 and out["examples"] == [] and out["data_range"] == []
+    assert any("no candles" in w for w in out["warnings"])
+    html = Path(server.build_report(NAME, "")["path"]).read_text(encoding="utf-8")
+    assert "No trades" in html
+
+
 def test_bad_date_is_explained(home, example, gold_data):
     server.save_strategy(example)
     with pytest.raises(ValueError, match="date"):

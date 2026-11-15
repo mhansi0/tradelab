@@ -90,6 +90,18 @@ def test_404_means_no_older_data():
     assert fetch_page("SPY", "5min", END, client).empty
 
 
+def test_400_no_data_also_means_no_older_data():
+    client = client_returning({"status": "error", "code": 400,
+                               "message": "No data is available on the specified dates."})
+    assert fetch_page("SPY", "5min", END, client).empty
+
+
+def test_other_400_is_still_an_error():
+    client = client_returning({"status": "error", "code": 400, "message": "Invalid interval"})
+    with pytest.raises(DataSourceError, match="Invalid interval"):
+        fetch_page("SPY", "5min", END, client)
+
+
 def test_rate_limit_retries_then_fails():
     client = client_returning({"status": "error", "code": 429, "message": "limit"})
     slept = []

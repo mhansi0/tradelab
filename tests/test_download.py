@@ -78,6 +78,11 @@ def test_download_logs_progress_without_key(home, monkeypatch):
     assert not any("SECRET123" in line for line in lines)
 
 
+def test_market_names_are_forgiving(home):
+    download([" gold "], fetch=full_fetch, now=NOW, log=QUIET)
+    assert not load_base("GOLD", "5min").empty
+
+
 def test_unknown_market_fails_before_any_request(home):
     with pytest.raises(ValueError, match="BITCOIN"):
         download(["BITCOIN"], fetch=full_fetch, now=NOW, log=QUIET)
