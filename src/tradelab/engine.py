@@ -25,6 +25,10 @@ class Trade:
     r: float | None
     bars_held: int
 
+    def as_dict(self) -> dict:
+        """Plain JSON: times become ISO text."""
+        return {k: v.isoformat() if isinstance(v, pd.Timestamp) else v for k, v in vars(self).items()}
+
 
 @dataclass
 class Skipped:
@@ -136,7 +140,7 @@ def run(strategy: Strategy, candles: pd.DataFrame, env: dict | None = None) -> B
             exit_time=times[x] if closed else None,
             exit=float(exit_price) if closed else None,
             outcome=outcome,
-            r=float((exit_price - entry) * side / risk) if closed else None,
+            r=round(float((exit_price - entry) * side / risk), 6) if closed else None,
             bars_held=x - e + 1))
         if not closed:
             break

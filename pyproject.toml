@@ -5,7 +5,7 @@ description = "Backtest trading strategies described in plain language, from ins
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11,<3.14"
-dependencies = ["mcp", "pandas", "pyarrow", "plotly", "httpx", "pydantic>=2"]
+dependencies = ["mcp>=2,<3", "pandas", "pyarrow", "plotly", "httpx", "pydantic>=2"]
 
 [project.scripts]
 tradelab = "tradelab.download:main"

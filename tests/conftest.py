@@ -42,6 +42,39 @@ def chart_case(example):
 
 
 @pytest.fixture
+def gold_data(home):
+    """20 days of stored 5-minute gold candles on which the maker's example trades once a day.
+
+    Every day opens with a 1% drop and a small bounce (the setup). On even days the price keeps
+    falling (target hit), on odd days it jumps above the first candle (stop hit).
+    """
+    from tradelab.store import save_candles
+
+    win_day = [0.99, 1.002] + [0.99] * 6 + [0.999] * 16
+    loss_day = [0.99, 1.002, 1.012] + [0.998] * 21
+    price, opens, closes = 2000.0, [], []
+    for day in range(20):
+        for factor in (win_day if day % 2 == 0 else loss_day):
+            steps = np.linspace(price, price * factor, 13)  # 12 five-minute candles per hour
+            opens.extend(steps[:-1])
+            closes.extend(steps[1:])
+            price *= factor
+    candles = make_candles("2025-01-06 00:00", len(opens), "5min")
+    candles["open"], candles["close"] = opens, closes
+    candles["high"] = candles[["open", "close"]].max(axis=1)
+    candles["low"] = candles[["open", "close"]].min(axis=1)
+    save_candles("GOLD", "5min", candles)
+    return candles
+
+
+@pytest.fixture
+def never_triggers(example) -> dict:
+    example["name"] = "never"
+    example["setups"][0]["entry_when"] = ["close < 0"]
+    return example
+
+
+@pytest.fixture
 def home(tmp_path, monkeypatch):
     monkeypatch.setenv("TRADELAB_HOME", str(tmp_path))
     return tmp_path

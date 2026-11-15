@@ -153,6 +153,17 @@ def test_two_setups_long_and_short():
         ("up", "long", "tp"), ("down", "short", "tp")]
 
 
+def test_trade_as_dict_is_plain_json():
+    import json
+
+    t = only_trade(run(strat(), candles([FLAT, FLAT, (100, 102.5, 99.5, 102)])))
+    d = t.as_dict()
+    assert d["signal_time"] == "2025-01-02T00:00:00+00:00" and d["r"] == 2.0 and d["outcome"] == "tp"
+    assert json.loads(json.dumps(d)) == d
+    still_open = only_trade(run(strat(), candles([FLAT, FLAT, FLAT]))).as_dict()
+    assert still_open["exit_time"] is None and still_open["r"] is None
+
+
 def test_result_reports_the_data_it_used():
     data = candles([FLAT, FLAT, FLAT])
     result = run(strat(), data)
