@@ -1,6 +1,6 @@
 # Hosting the data files
 
-For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Backblaze B2.
+For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Cloudflare R2.
 
 ## The attribution that goes with every copy
 
@@ -27,10 +27,10 @@ Share the original files, not tradelab's stored copies: the originals carry `cit
    ```
 
    Rewrite it whenever files are added.
-2. In Backblaze create a B2 bucket. The first 10 GB of storage is free, and downloads are free up to 3 times the stored data per month, then $0.01 per GB (Backblaze's pricing page, checked 15 November 2026). The 1313 files are 6 GB, so about 4 GB is left, and about 18 GB of downloads a month are free. Their bucket page speaks of 1 GB of free downloads per day instead: that contradicts the pricing page, so look at your own bill in the first weeks. Set a spending cap in your Backblaze account (not checked how).
-3. Make the bucket public (bucket type `allPublic`), so that files can be downloaded without a login. The address must be `https`. A custom domain cannot be put on a B2 bucket directly (Backblaze says so); the address of the bucket is enough for `tradelab fetch`.
-4. Upload the folder with `rclone`, which has a B2 backend (create an application key in your Backblaze account; never paste it in a chat or in the repository). The website is slow for 1300 files. Check rclone's B2 page for the exact settings.
-5. In the B2 website open one file: it shows the address to download that file (the "friendly URL"). Remove the file name from it: what is left is the address of the folder for `--source`. Test: `tradelab fetch --source https://<that address> --list EUR`.
+2. In Cloudflare create an R2 bucket. The free tier has 10 GB of storage per month and no charge for downloads (Cloudflare's pricing page, checked 15 November 2026). The 1313 files are 6 GB, so about 4 GB is left: check the size before adding more. Whether Cloudflare asks for a payment method to switch R2 on is not checked.
+3. Make the bucket readable without a login by switching on its public development URL (`https://pub-<code>.r2.dev`, shown in the bucket settings). Cloudflare says that `r2.dev` addresses are rate-limited (the limit is not published), meant for non-production traffic, and without caching or access control. That is enough to start: `tradelab fetch` gets a few files of 1 to 30 MB. When it gets throttled, add a custom domain: it must be a zone in the same Cloudflare account as the bucket (a bought domain, or one added with a partial CNAME setup), and then only the address in the README and in `fetch.py` changes.
+4. Upload the folder with `rclone`: create an R2 API token with read and write rights for this bucket (never paste its keys in a chat or in the repository), and use rclone's S3 type with provider Cloudflare and the endpoint `https://<account id>.r2.cloudflarestorage.com`. The Cloudflare website is slow for 1300 files. Check Cloudflare's rclone page for the exact settings.
+5. Test: `tradelab fetch --source https://pub-<code>.r2.dev --list EUR`.
 6. Put the address in the README and, if wanted, as the default in `fetch.py` so that `--source` can be left out.
 
 Do not put the files in the git repository.
