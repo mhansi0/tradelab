@@ -36,7 +36,7 @@ Share the original files, not tradelab's stored copies: the originals carry `cit
    hf upload <username>/tradelab-candles "<folder>" . --repo-type=dataset
    ```
 
-6. The address for `--source` is `https://huggingface.co/datasets/<username>/tradelab-candles/resolve/main` (the usual address pattern for a file in a dataset; test it). Test: `tradelab fetch --source <that address> --list EUR`. Anonymous downloads are limited to 3,000 file requests per 5 minutes per IP address (Hugging Face's rate limit page, September 2025 figures, subject to change). Fetching a handful of markets uses a handful of requests.
-7. Put the address in the README and, if wanted, as the default in `fetch.py` so that `--source` can be left out.
+6. The address for `--source` is `https://huggingface.co/datasets/<username>/tradelab-candles/resolve/main` (tested on 18 November 2026: `--list` and a real download of EURUSD and AAPL worked). Test: `tradelab fetch --source <that address> --list EUR`. Anonymous downloads are limited to 3,000 file requests per 5 minutes per IP address (Hugging Face's rate limit page, September 2025 figures, subject to change). Fetching a handful of markets uses a handful of requests.
+7. Put the address in the README and as `DEFAULT_SOURCE` in `fetch.py` so that `--source` can be left out (done for `DDZI43/tradelab-data`).
 
 Do not put the files in the git repository.

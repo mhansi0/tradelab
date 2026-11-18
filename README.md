@@ -77,11 +77,11 @@ Ask Claude to search the data ("which tradelab data do I have for AAPL?"): impor
 Nobody has to download the whole set. If someone published the files as a web folder (one `.parquet` per market, plus an `index.json`), you fetch single markets:
 
 ```
-tradelab fetch --source https://<the web folder> --list EUR
-tradelab fetch --source https://<the web folder> AAPL EURUSD
+tradelab fetch --list EUR
+tradelab fetch AAPL EURUSD
 ```
 
-Set the environment variable `TRADELAB_DATA_URL` to the folder once and leave out `--source`. A market is about 1 to 30 MB. Only `https` addresses work, and nothing is downloaded when one name is not in the index.
+The files come from the Hugging Face dataset [DDZI43/tradelab-data](https://huggingface.co/datasets/DDZI43/tradelab-data). To use another web folder, pass `--source <https address>` or set the environment variable `TRADELAB_DATA_URL`. A market is about 1 to 30 MB. Only `https` addresses work, and nothing is downloaded when one name is not in the index.
 
 The files are shared as a Hugging Face dataset, see [docs/hosting-the-data.md](docs/hosting-the-data.md). They are not mine: the US stocks come from the [HF Data Library](https://hfdatalibrary.com) (Ahmed Elkassabgi, CC BY 4.0), "Data provided for free by IEX.", and the forex and CFD candles from [HistData.com](https://www.histdata.com). Their terms still apply to you. The stock data is for academic and educational research only: do not trade on it (see [docs/data-sources.md](docs/data-sources.md#terms-of-the-stock-data)). The repository itself never holds the data.
 
