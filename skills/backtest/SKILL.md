@@ -39,7 +39,7 @@ The key goes in the file `~/.tradelab/twelvedata.key` (one line) or in the envir
 uv run --directory "${CLAUDE_PLUGIN_ROOT}" tradelab import-parquet <folder>
 ```
 
-The market name is the file name up to the first underscore (`AAPL_clean_1min.parquet` is `AAPL`). When someone has published the files as a web folder, `tradelab fetch --source <https address> AAPL EURUSD` gets only those markets. Stock files from the HF Data Library may be used for academic and educational research only: tell the user that once when they pick a US stock, and do not suggest trading on the result.
+The market name is the file name up to the first underscore (`AAPL_clean_1min.parquet` is `AAPL`). `tradelab fetch AAPL EURUSD` gets only those markets from the shared Hugging Face dataset (`tradelab fetch --list EUR` shows what exists). Stock files from the HF Data Library may be used for academic and educational research only: tell the user that once when they pick a US stock, and do not suggest trading on the result.
 
 A market holds candles from one source only. `data_status` shows the `source` and a `note` per market. Tell the user what the note says when it matters for their strategy: HistData files have no volume and their index prices trade almost around the clock, and with Twelve Data silver is the SLV fund, US market hours only.
 

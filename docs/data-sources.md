@@ -70,7 +70,7 @@ What was checked on 15 November 2026:
 
 The maker asked both providers by email (HF Data Library for the stocks, HistData.com for the forex or CFD files, which are HistData candles converted to parquet). Both answered that sharing is fine as long as the source is named. That is the maker's report: the emails are not in this repository, so keep them. The terms of use above still apply to whoever uses the data, so the stock files stay for academic and educational research.
 
-The text that goes with every shared copy is in [hosting-the-data.md](hosting-the-data.md), which also describes how the files are put on Cloudflare R2 for `tradelab fetch`. The notes that `data_status` and every backtest show carry the same source names.
+The text that goes with every shared copy is in [hosting-the-data.md](hosting-the-data.md), which also describes how the files are put on Hugging Face for `tradelab fetch`. The notes that `data_status` and every backtest show carry the same source names.
 
 ## Twelve Data, what the free plan gives (checked 15 November 2026)
 

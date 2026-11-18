@@ -19,6 +19,7 @@ from .parquet_import import import_parquet_folder
 from .twelvedata import DataSourceError
 
 SOURCE_ENV = "TRADELAB_DATA_URL"
+DEFAULT_SOURCE = "https://huggingface.co/datasets/DDZI43/tradelab-data/resolve/main"
 MAX_FILE_BYTES = 500_000_000  # the biggest file of the 1313 is 31 MB
 FILE_NAME = re.compile(r"[A-Za-z0-9._-]+\.parquet")
 
@@ -37,13 +38,13 @@ def _open(client: httpx.Client | None):
 
 
 def _address(source: str | None) -> str:
-    address = (source or os.environ.get(SOURCE_ENV, "")).rstrip("/")
+    address = (source or os.environ.get(SOURCE_ENV) or DEFAULT_SOURCE).rstrip("/")
     url = urlparse(address)
     # https only; plain http just for a folder served on this computer (testing)
     if url.scheme != "https" and not (url.scheme == "http" and url.hostname in ("localhost", "127.0.0.1")):
         raise DataSourceError(
-            f"No download address. Pass --source https://... or set {SOURCE_ENV}. "
-            "It is the web folder that holds the .parquet files and their index.json.")
+            f"Not a usable download address. It must be an https:// web folder that holds the .parquet files "
+            f"and their index.json (--source or {SOURCE_ENV}).")
     return address
 
 

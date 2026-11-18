@@ -4,7 +4,7 @@ import httpx
 import pandas as pd
 import pytest
 
-from tradelab.fetch import SOURCE_ENV, available, fetch, write_index
+from tradelab.fetch import DEFAULT_SOURCE, SOURCE_ENV, available, fetch, write_index
 from tradelab.markets import imported_keys
 from tradelab.store import load_base
 from tradelab.twelvedata import DataSourceError
@@ -54,11 +54,24 @@ def test_an_unknown_name_stops_before_anything_is_downloaded(home, server):
     assert requests == ["index.json"] and imported_keys() == []
 
 
-def test_a_missing_address_says_how_to_set_it(monkeypatch):
+def test_an_unusable_address_says_how_to_set_it(monkeypatch):
     monkeypatch.delenv(SOURCE_ENV, raising=False)
-    for source in (None, "http://plain.example.test", "http://localhost.evil.test"):  # https only
+    for source in ("http://plain.example.test", "http://localhost.evil.test"):  # https only
         with pytest.raises(DataSourceError, match=SOURCE_ENV):
             available(source)
+
+
+def test_without_an_address_the_shared_dataset_is_used(monkeypatch):
+    monkeypatch.delenv(SOURCE_ENV, raising=False)
+    seen = []
+
+    def handler(request):
+        seen.append(str(request.url))
+        return httpx.Response(200, json={"files": ["AAPL_clean_1min.parquet"]})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    assert set(available(None, client)) == {"AAPL"}
+    assert seen == [f"{DEFAULT_SOURCE}/index.json"]
 
 
 def test_plain_http_is_allowed_for_this_computer_only(server):

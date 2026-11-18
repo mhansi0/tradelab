@@ -1,6 +1,6 @@
 # Hosting the data files
 
-For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Cloudflare R2.
+For whoever publishes the candle files so that `tradelab fetch` can get single markets. The maker does this on Hugging Face, as a public dataset.
 
 ## The attribution that goes with every copy
 
@@ -27,10 +27,16 @@ Share the original files, not tradelab's stored copies: the originals carry `cit
    ```
 
    Rewrite it whenever files are added.
-2. In Cloudflare create an R2 bucket. The free plan has 10 GB of storage and no charge for downloads (Cloudflare's pricing page, checked 15 November 2026). The 1313 files are 6 GB, so about 4 GB is left: check the size before adding more.
-3. Make the bucket readable without a login. For `tradelab fetch` the address must be `https`. A custom domain on the bucket is the stable choice; the `r2.dev` address Cloudflare offers is meant for testing and may be limited (not checked).
-4. Upload the folder with an S3 tool such as `rclone` (create an R2 API token in Cloudflare; the endpoint is `https://<account id>.r2.cloudflarestorage.com`). The dashboard is slow for 1300 files. Check Cloudflare's rclone page for the exact settings.
-5. Test: `tradelab fetch --source https://<your address> --list EUR`.
-6. Put the address in the README and, if wanted, as the default in `fetch.py` so that `--source` can be left out.
+2. On huggingface.co make a free account and create a new **dataset** repository, public, for example `<username>/tradelab-candles`. Public storage is free but "best-effort" (Hugging Face's storage page, checked 17 November 2026): beyond the first few gigabytes they ask for data that is useful to the community, and they may set limits. The 1313 files are 6 GB. A dataset card is required for large datasets: the folder holds one (`README.md`). If Hugging Face ever limits the repository, the same files work on any web folder (Cloudflare R2, Backblaze B2) and only the address changes.
+3. Create an access token with write rights (Settings, Access Tokens). Never paste it in a chat or in the repository.
+4. Install the command `hf` (`uv tool install huggingface_hub`, or `pip install -U huggingface_hub`; check Hugging Face's install page) and log in with `hf auth login`. You paste the token there yourself.
+5. Upload the folder to the repository root. The upload splits itself into several commits and can be started again after an interruption:
+
+   ```
+   hf upload <username>/tradelab-candles "<folder>" . --repo-type=dataset
+   ```
+
+6. The address for `--source` is `https://huggingface.co/datasets/<username>/tradelab-candles/resolve/main` (tested on 18 November 2026: `--list` and a real download of EURUSD and AAPL worked). Test: `tradelab fetch --source <that address> --list EUR`. Anonymous downloads are limited to 3,000 file requests per 5 minutes per IP address (Hugging Face's rate limit page, September 2025 figures, subject to change). Fetching a handful of markets uses a handful of requests.
+7. Put the address in the README and as `DEFAULT_SOURCE` in `fetch.py` so that `--source` can be left out (done for `DDZI43/tradelab-data`).
 
 Do not put the files in the git repository.
